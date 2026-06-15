@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graven Image 3 Trainer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="panel left-panel">
+      <h1>Graven Image 3</h1>
+      <p class="subtitle">Dancing Mad arrow + tether trainer</p>
+
+      <label for="roleSelect">Your role</label>
+      <select id="roleSelect">
+        <option>MT</option><option>OT</option><option>H1</option><option>H2</option>
+        <option>M1</option><option>M2</option><option>R1</option><option>R2</option>
+      </select>
+
+      <button id="generateBtn" class="primary">Generate assignment</button>
+      <button id="resetStatsBtn" class="secondary">Reset stats</button>
+
+      <div class="assignment-card">
+        <h2>Assignment</h2>
+        <div class="row"><span>Role</span><strong id="roleOut">MT</strong></div>
+        <div class="row"><span>Arrows</span><strong id="arrowsOut">→ + →</strong></div>
+        <div class="row"><span>Tether</span><strong id="tetherOut">LEFT</strong></div>
+        <div class="row"><span>Timer</span><strong id="timerOut">0.0s</strong></div>
+      </div>
+
+      <div class="stats-card">
+        <h2>Stats</h2>
+        <div class="row"><span>Attempts</span><strong id="attemptsOut">0</strong></div>
+        <div class="row"><span>Accuracy</span><strong id="accuracyOut">0%</strong></div>
+        <div class="row"><span>Avg solve</span><strong id="avgOut">—</strong></div>
+      </div>
+    </section>
+
+    <section class="arena-section">
+      <div class="arena-wrap">
+        <div class="arena" id="arena">
+          <div class="marker marker-n">A</div>
+          <div class="marker marker-e">B</div>
+          <div class="marker marker-s">C</div>
+          <div class="marker marker-w">D</div>
+
+          <button class="spot" data-spot="NW">NW</button>
+          <button class="spot" data-spot="N">N</button>
+          <button class="spot" data-spot="NE">NE</button>
+          <button class="spot" data-spot="E">E</button>
+          <button class="spot" data-spot="SE">SE</button>
+          <button class="spot" data-spot="S">S</button>
+          <button class="spot" data-spot="SW">SW</button>
+          <button class="spot" data-spot="W">W</button>
+
+          <div class="center-text">select<br />your<br />placement</div>
+        </div>
+      </div>
+
+      <div class="answer-panel">
+        <div>
+          <h2>Your answer</h2>
+          <p>Placement: <strong id="selectedSpotOut">None</strong></p>
+        </div>
+        <div class="lane-buttons">
+          <button class="lane" data-lane="inside">Inside</button>
+          <button class="lane" data-lane="outside">Outside</button>
+        </div>
+        <button id="checkBtn" class="primary">Check answer</button>
+        <button id="showBtn" class="secondary">Show solution</button>
+      </div>
+
+      <div id="resultBox" class="result-box muted">Generate an assignment to start.</div>
+    </section>
+
+    <section class="panel right-panel">
+      <h2>Rules</h2>
+      <div class="rule"><strong>Matching arrows</strong><span>go to cardinal spots: N, E, S, W.</span></div>
+      <div class="rule"><strong>Mixed arrows</strong><span>go to intercard spots: NE, SE, SW, NW.</span></div>
+      <div class="rule"><strong>Everyone orients clockwise</strong><span>follow the arrow pair around the arena ring.</span></div>
+      <div class="rule"><strong>Left tether</strong><span>go outside of cardinal markers after placing.</span></div>
+      <div class="rule"><strong>Right tether</strong><span>go inside of cardinal markers after placing.</span></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
