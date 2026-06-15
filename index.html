@@ -1,89 +1,463 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Graven Image 3 Trainer</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Graven 3 Trainer</title>
+  <style>
+    :root {
+      --bg:#101018; --panel:#171726; --panel2:#202033; --text:#f4f4ff;
+      --muted:#aaaac0; --good:#7ee787; --bad:#ff7b72; --accent:#b39cff;
+      --border:#34344d; --pink:#ff87c8; --orange:#ffb86b;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; background:linear-gradient(180deg,#0d0d14,#171725);
+      color:var(--text); font-family:system-ui,Segoe UI,sans-serif;
+    }
+    header { padding:22px; text-align:center; }
+    h1 { margin:0; font-size:28px; }
+    .subtitle { color:var(--muted); margin-top:6px; }
+
+    main {
+      display:grid; grid-template-columns:300px 1fr 320px;
+      gap:18px; padding:18px; max-width:1400px; margin:auto;
+    }
+    .card {
+      background:rgba(23,23,38,.92); border:1px solid var(--border);
+      border-radius:18px; padding:16px; box-shadow:0 8px 30px #0005;
+    }
+    h2 { margin:0 0 12px; font-size:18px; }
+    label { display:block; color:var(--muted); font-size:13px; margin:12px 0 6px; }
+    select, button {
+      width:100%; border:1px solid var(--border); border-radius:12px;
+      background:var(--panel2); color:var(--text); padding:10px 12px;
+      font-size:15px;
+    }
+    button { cursor:pointer; font-weight:700; }
+    button:hover { border-color:var(--accent); }
+    .primary { background:#6f58d9; border-color:#8f7cff; }
+    .ghost { background:transparent; }
+
+    .assignment {
+      text-align:center; padding:14px; border:1px solid var(--border);
+      border-radius:14px; background:#11111d; margin-top:12px;
+    }
+    .debuffs { font-size:42px; letter-spacing:4px; margin:8px 0; }
+    .order { color:var(--muted); font-size:15px; }
+    .tether { font-size:22px; font-weight:900; margin-top:8px; }
+    .left { color:#8ecbff; }
+    .right { color:#ffb0dc; }
+
+    .party-row {
+      display:grid; grid-template-columns:44px 1fr 62px;
+      align-items:center; gap:8px; padding:8px 10px; border-radius:10px;
+      margin-bottom:6px; background:#11111d; border:1px solid transparent;
+    }
+    .party-row.active { border-color:var(--accent); background:#25213f; }
+    .pair { font-size:22px; letter-spacing:2px; }
+    .small { color:var(--muted); font-size:12px; }
+
+    .arena-wrap { display:flex; justify-content:center; align-items:center; min-height:660px; }
+    .arena {
+      position:relative; width:620px; height:620px; border-radius:50%;
+      background:radial-gradient(circle,#24243a 0 38%,#11111d 39% 100%);
+      border:2px solid var(--border);
+    }
+    .center-label {
+      position:absolute; inset:245px; display:flex; align-items:center; justify-content:center;
+      text-align:center; color:var(--muted); font-weight:800;
+    }
+
+    .spot, .final {
+      position:absolute; width:82px; height:58px; transform:translate(-50%,-50%);
+      border:2px solid var(--border); border-radius:12px; background:#202033;
+      color:var(--text); display:flex; align-items:center; justify-content:center;
+      text-align:center; cursor:pointer; font-weight:800; user-select:none;
+    }
+    .spot:hover, .final:hover { border-color:var(--accent); }
+    .spot.selected1 { outline:3px solid #7ee787; }
+    .spot.selected2 { outline:3px solid #ffcf70; }
+    .final.selectedFinal { outline:3px solid #8ecbff; }
+
+    .final { width:92px; height:44px; font-size:12px; background:#2a2238; }
+
+    .step {
+      display:flex; gap:8px; margin:10px 0;
+    }
+    .step button {
+      font-size:13px; padding:9px;
+    }
+    .step button.active {
+      background:#6f58d9; border-color:#b39cff;
+    }
+
+    .result {
+      margin-top:14px; padding:12px; border-radius:12px; background:#11111d;
+      border:1px solid var(--border); white-space:pre-line;
+    }
+    .result.good { border-color:var(--good); color:var(--good); }
+    .result.bad { border-color:var(--bad); color:var(--bad); }
+
+    .stats {
+      display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;
+    }
+    .stat { background:#11111d; border:1px solid var(--border); border-radius:12px; padding:10px; }
+    .stat b { display:block; font-size:20px; }
+
+    @media (max-width:1100px) {
+      main { grid-template-columns:1fr; }
+      .arena { transform:scale(.88); }
+      .arena-wrap { min-height:560px; }
+    }
+  </style>
 </head>
 <body>
-  <main class="app-shell">
-    <section class="panel left-panel">
-      <h1>Graven Image 3</h1>
-      <p class="subtitle">Dancing Mad arrow + tether trainer</p>
+<header>
+  <h1>Graven Image 3 Trainer</h1>
+  <div class="subtitle">Dancing Mad arrow/tether practice</div>
+</header>
 
-      <label for="roleSelect">Your role</label>
-      <select id="roleSelect">
-        <option>MT</option><option>OT</option><option>H1</option><option>H2</option>
-        <option>M1</option><option>M2</option><option>R1</option><option>R2</option>
-      </select>
+<main>
+  <section class="card">
+    <h2>Setup</h2>
 
-      <button id="generateBtn" class="primary">Generate assignment</button>
-      <button id="resetStatsBtn" class="secondary">Reset stats</button>
+    <label>Your role</label>
+    <select id="roleSelect">
+      <option>MT</option><option>OT</option><option>H1</option><option>H2</option>
+      <option>M1</option><option>M2</option><option>R1</option><option>R2</option>
+    </select>
 
-      <div class="assignment-card">
-        <h2>Assignment</h2>
-        <div class="row"><span>Role</span><strong id="roleOut">MT</strong></div>
-        <div class="row"><span>Arrows</span><strong id="arrowsOut">→ + →</strong></div>
-        <div class="row"><span>Tether</span><strong id="tetherOut">LEFT</strong></div>
-        <div class="row"><span>Timer</span><strong id="timerOut">0.0s</strong></div>
+    <label>Mode</label>
+    <select id="modeSelect">
+      <option value="learning">Learning</option>
+      <option value="exam">Exam</option>
+    </select>
+
+    <button class="primary" id="newPullBtn" style="margin-top:14px;">New Pull</button>
+    <button class="ghost" id="resetBtn" style="margin-top:8px;">Reset Current Answer</button>
+
+    <div class="assignment">
+      <div class="small">Your Assignment</div>
+      <div id="roleOut" style="font-size:22px;font-weight:900;">H2</div>
+      <div id="debuffOut" class="debuffs">⬆️⬆️</div>
+      <div id="orderOut" class="order">short → long</div>
+      <div id="tetherOut" class="tether left">LEFT</div>
+    </div>
+
+    <h2 style="margin-top:18px;">Party List</h2>
+    <div id="partyList"></div>
+  </section>
+
+  <section class="card">
+    <h2>Arena</h2>
+    <div class="step">
+      <button id="step1" class="active">1st Arrow</button>
+      <button id="step2">2nd Arrow</button>
+      <button id="step3">Final Spot</button>
+    </div>
+
+    <div class="arena-wrap">
+      <div class="arena" id="arena">
+        <div class="center-label">click 1st arrow,<br>2nd arrow,<br>then final spot</div>
       </div>
+    </div>
+  </section>
 
-      <div class="stats-card">
-        <h2>Stats</h2>
-        <div class="row"><span>Attempts</span><strong id="attemptsOut">0</strong></div>
-        <div class="row"><span>Accuracy</span><strong id="accuracyOut">0%</strong></div>
-        <div class="row"><span>Avg solve</span><strong id="avgOut">—</strong></div>
-      </div>
-    </section>
+  <section class="card">
+    <h2>Answer</h2>
+    <div class="small">Selected</div>
+    <div id="selectedOut" class="result">1st: —
+2nd: —
+Final: —</div>
 
-    <section class="arena-section">
-      <div class="arena-wrap">
-        <div class="arena" id="arena">
-          <div class="marker marker-n">A</div>
-          <div class="marker marker-e">B</div>
-          <div class="marker marker-s">C</div>
-          <div class="marker marker-w">D</div>
+    <button class="primary" id="checkBtn">Check Answer</button>
+    <button class="ghost" id="showBtn" style="margin-top:8px;">Show Solution</button>
 
-          <button class="spot" data-spot="NW">NW</button>
-          <button class="spot" data-spot="N">N</button>
-          <button class="spot" data-spot="NE">NE</button>
-          <button class="spot" data-spot="E">E</button>
-          <button class="spot" data-spot="SE">SE</button>
-          <button class="spot" data-spot="S">S</button>
-          <button class="spot" data-spot="SW">SW</button>
-          <button class="spot" data-spot="W">W</button>
+    <div id="resultOut" class="result">Generate a pull and solve your role.</div>
 
-          <div class="center-text">select<br />your<br />placement</div>
-        </div>
-      </div>
+    <h2 style="margin-top:18px;">Stats</h2>
+    <div class="stats">
+      <div class="stat"><span class="small">Attempts</span><b id="attempts">0</b></div>
+      <div class="stat"><span class="small">Accuracy</span><b id="accuracy">0%</b></div>
+      <div class="stat"><span class="small">Streak</span><b id="streak">0</b></div>
+      <div class="stat"><span class="small">Best</span><b id="best">0</b></div>
+    </div>
+  </section>
+</main>
 
-      <div class="answer-panel">
-        <div>
-          <h2>Your answer</h2>
-          <p>Placement: <strong id="selectedSpotOut">None</strong></p>
-        </div>
-        <div class="lane-buttons">
-          <button class="lane" data-lane="inside">Inside</button>
-          <button class="lane" data-lane="outside">Outside</button>
-        </div>
-        <button id="checkBtn" class="primary">Check answer</button>
-        <button id="showBtn" class="secondary">Show solution</button>
-      </div>
+<script>
+const ROLES = ["MT","OT","H1","H2","M1","M2","R1","R2"];
 
-      <div id="resultBox" class="result-box muted">Generate an assignment to start.</div>
-    </section>
+const VALID_PAIRS = [
+  { id:"N",  arrows:["➡️","➡️"], spots:["N1","N2"] },
+  { id:"E",  arrows:["⬇️","⬇️"], spots:["E1","E2"] },
+  { id:"S",  arrows:["⬅️","⬅️"], spots:["S1","S2"] },
+  { id:"W",  arrows:["⬆️","⬆️"], spots:["W1","W2"] },
+  { id:"NE", arrows:["➡️","⬇️"], spots:["N2","E1"] },
+  { id:"SE", arrows:["⬇️","⬅️"], spots:["E2","S2"] },
+  { id:"SW", arrows:["⬆️","⬅️"], spots:["W2","S1"] },
+  { id:"NW", arrows:["➡️","⬆️"], spots:["N1","W1"] },
+];
 
-    <section class="panel right-panel">
-      <h2>Rules</h2>
-      <div class="rule"><strong>Matching arrows</strong><span>go to cardinal spots: N, E, S, W.</span></div>
-      <div class="rule"><strong>Mixed arrows</strong><span>go to intercard spots: NE, SE, SW, NW.</span></div>
-      <div class="rule"><strong>Everyone orients clockwise</strong><span>follow the arrow pair around the arena ring.</span></div>
-      <div class="rule"><strong>Left tether</strong><span>go outside of cardinal markers after placing.</span></div>
-      <div class="rule"><strong>Right tether</strong><span>go inside of cardinal markers after placing.</span></div>
-    </section>
-  </main>
+const FINAL_DIR = {
+  MT:"North", H2:"East", H1:"South", OT:"West",
+  M1:"North", R2:"East", R1:"South", M2:"West"
+};
 
-  <script src="script.js"></script>
+const ROLE_ICON = {
+  MT:"🛡️", OT:"🛡️", H1:"➕", H2:"➕",
+  M1:"⚔️", M2:"⚔️", R1:"🏹", R2:"🏹"
+};
+
+const SPOT_POS = {
+  N1:[260,72], N2:[360,72],
+  E1:[548,260], E2:[548,360],
+  S1:[260,548], S2:[360,548],
+  W1:[72,260], W2:[72,360],
+};
+
+const FINAL_POS = {
+  "Outside North":[310,20], "Inside North":[310,135],
+  "Outside East":[600,310], "Inside East":[485,310],
+  "Outside South":[310,600], "Inside South":[310,485],
+  "Outside West":[20,310], "Inside West":[135,310],
+};
+
+let pull = {};
+let selectedRole = "MT";
+let activeStep = 1;
+let answer = { first:null, second:null, final:null };
+let startTime = Date.now();
+
+let stats = { attempts:0, correct:0, streak:0, best:0 };
+
+const el = id => document.getElementById(id);
+const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+const rand = arr => arr[Math.floor(Math.random()*arr.length)];
+
+function newPull() {
+  selectedRole = el("roleSelect").value;
+  const shuffledPairs = shuffle(VALID_PAIRS);
+
+  pull = {};
+  ROLES.forEach((role, i) => {
+    const pair = structuredClone(shuffledPairs[i]);
+    const order = Math.random() < .5 ? pair.arrows : [...pair.arrows].reverse();
+    pull[role] = {
+      role,
+      pair,
+      display: pair.arrows.join(""),
+      order,
+      tether: Math.random() < .5 ? "LEFT" : "RIGHT",
+    };
+  });
+
+  startTime = Date.now();
+  resetAnswer();
+  render();
+}
+
+function correctSolution(role) {
+  const a = pull[role];
+  const correctSpots = {};
+
+  a.pair.arrows.forEach((arrow, index) => {
+    const spot = a.pair.spots[index];
+    if (!correctSpots[arrow]) correctSpots[arrow] = [];
+    correctSpots[arrow].push(spot);
+  });
+
+  const firstArrow = a.order[0];
+  const secondArrow = a.order[1];
+
+  let firstSpot;
+  let secondSpot;
+
+  if (firstArrow === secondArrow) {
+    firstSpot = a.pair.spots[0];
+    secondSpot = a.pair.spots[1];
+  } else {
+    firstSpot = correctSpots[firstArrow][0];
+    secondSpot = correctSpots[secondArrow][0];
+  }
+
+  const lane = a.tether === "LEFT" ? "Outside" : "Inside";
+  const final = `${lane} ${FINAL_DIR[role]}`;
+
+  return { firstSpot, secondSpot, final };
+}
+
+function resetAnswer() {
+  answer = { first:null, second:null, final:null };
+  activeStep = 1;
+  el("resultOut").className = "result";
+  el("resultOut").textContent = "Pick your 1st arrow, 2nd arrow, then final spot.";
+  render();
+}
+
+function renderArena() {
+  const arena = el("arena");
+  arena.querySelectorAll(".spot,.final").forEach(n => n.remove());
+
+  for (const [name, [x,y]] of Object.entries(SPOT_POS)) {
+    const d = document.createElement("div");
+    d.className = "spot";
+    d.style.left = x+"px";
+    d.style.top = y+"px";
+    d.textContent = name;
+    if (answer.first === name) d.classList.add("selected1");
+    if (answer.second === name) d.classList.add("selected2");
+    d.onclick = () => {
+      if (activeStep === 1) answer.first = name;
+      if (activeStep === 2) answer.second = name;
+      render();
+    };
+    arena.appendChild(d);
+  }
+
+  for (const [name, [x,y]] of Object.entries(FINAL_POS)) {
+    const d = document.createElement("div");
+    d.className = "final";
+    d.style.left = x+"px";
+    d.style.top = y+"px";
+    d.textContent = name.replace(" ","\n");
+    if (answer.final === name) d.classList.add("selectedFinal");
+    d.onclick = () => {
+      activeStep = 3;
+      answer.final = name;
+      render();
+    };
+    arena.appendChild(d);
+  }
+}
+
+function renderParty() {
+  const box = el("partyList");
+  box.innerHTML = "";
+  ROLES.forEach(role => {
+    const a = pull[role];
+    if (!a) return;
+    const row = document.createElement("div");
+    row.className = "party-row" + (role === selectedRole ? " active" : "");
+    row.innerHTML = `
+      <b>${role}</b>
+      <span class="pair">${a.display}</span>
+      <span class="small ${a.tether === "LEFT" ? "left" : "right"}">${a.tether}</span>
+    `;
+    box.appendChild(row);
+  });
+}
+
+function renderAssignment() {
+  const a = pull[selectedRole];
+  if (!a) return;
+
+  el("roleOut").textContent = `${ROLE_ICON[selectedRole]} ${selectedRole}`;
+  el("debuffOut").textContent = a.display;
+  el("orderOut").textContent = `${a.order[0]} → ${a.order[1]}`;
+  el("tetherOut").textContent = a.tether;
+  el("tetherOut").className = "tether " + (a.tether === "LEFT" ? "left" : "right");
+}
+
+function renderSelected() {
+  el("selectedOut").textContent =
+`1st: ${answer.first ?? "—"}
+2nd: ${answer.second ?? "—"}
+Final: ${answer.final ?? "—"}`;
+}
+
+function renderSteps() {
+  [1,2,3].forEach(n => el("step"+n).classList.toggle("active", activeStep === n));
+}
+
+function renderStats() {
+  el("attempts").textContent = stats.attempts;
+  el("accuracy").textContent = stats.attempts ? Math.round(stats.correct / stats.attempts * 100) + "%" : "0%";
+  el("streak").textContent = stats.streak;
+  el("best").textContent = stats.best;
+}
+
+function render() {
+  selectedRole = el("roleSelect").value;
+  renderArena();
+  renderParty();
+  renderAssignment();
+  renderSelected();
+  renderSteps();
+  renderStats();
+}
+
+function checkAnswer() {
+  const sol = correctSolution(selectedRole);
+  const okFirst = answer.first === sol.firstSpot;
+  const okSecond = answer.second === sol.secondSpot;
+  const okFinal = answer.final === sol.final;
+  const ok = okFirst && okSecond && okFinal;
+
+  stats.attempts++;
+  if (ok) {
+    stats.correct++;
+    stats.streak++;
+    stats.best = Math.max(stats.best, stats.streak);
+  } else {
+    stats.streak = 0;
+  }
+
+  const time = ((Date.now() - startTime) / 1000).toFixed(1);
+
+  el("resultOut").className = "result " + (ok ? "good" : "bad");
+
+  if (ok) {
+    el("resultOut").textContent =
+`✓ Correct!
+
+Time: ${time}s`;
+  } else {
+    const mode = el("modeSelect").value;
+    if (mode === "exam") {
+      el("resultOut").textContent = "✗ Incorrect.";
+    } else {
+      el("resultOut").textContent =
+`✗ Incorrect.
+
+Correct:
+1st Arrow: ${sol.firstSpot}
+2nd Arrow: ${sol.secondSpot}
+Final: ${sol.final}`;
+    }
+  }
+
+  renderStats();
+}
+
+function showSolution() {
+  if (el("modeSelect").value === "exam") {
+    el("resultOut").className = "result bad";
+    el("resultOut").textContent = "Solution hidden in Exam Mode.";
+    return;
+  }
+
+  const sol = correctSolution(selectedRole);
+  el("resultOut").className = "result";
+  el("resultOut").textContent =
+`Solution:
+1st Arrow: ${sol.firstSpot}
+2nd Arrow: ${sol.secondSpot}
+Final: ${sol.final}`;
+}
+
+el("newPullBtn").onclick = newPull;
+el("resetBtn").onclick = resetAnswer;
+el("checkBtn").onclick = checkAnswer;
+el("showBtn").onclick = showSolution;
+el("roleSelect").onchange = () => { selectedRole = el("roleSelect").value; resetAnswer(); render(); };
+
+el("step1").onclick = () => { activeStep = 1; render(); };
+el("step2").onclick = () => { activeStep = 2; render(); };
+el("step3").onclick = () => { activeStep = 3; render(); };
+
+newPull();
+</script>
 </body>
 </html>
